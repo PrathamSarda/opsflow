@@ -13,6 +13,7 @@ public class Product {
     private String description;
     private double price;
     private int stockQuantity;
+    private String unitSize;
     private String imageUrl; // Added field for product image URL
 
     // Getters
@@ -21,6 +22,7 @@ public class Product {
     public String getDescription() { return description; }
     public double getPrice() { return price; }
     public int getStockQuantity() { return stockQuantity; }
+    public String getUnitSize() { return unitSize; }
     public String getImageUrl() { return imageUrl; }
 
     // Setters
@@ -29,5 +31,6 @@ public class Product {
     public void setDescription(String description) { this.description = description; }
     public void setPrice(double price) { this.price = price; }
     public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
+    public void setUnitSize(String unitSize) { this.unitSize = unitSize; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }

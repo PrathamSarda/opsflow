@@ -13,6 +13,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { ordersApi } from '../../api';
+import { formatINR } from '../../utils/currency';
 
 function formatDateTime(dtStr) {
   if (!dtStr) return 'Recently placed';
@@ -124,7 +125,7 @@ export default function CustomerOrders() {
         </div>
         <div className="card" style={{ padding: '1.1rem 1.25rem' }}>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Lifetime Spend</div>
-          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--primary)', marginTop: '0.2rem' }}>${totalSpent.toFixed(2)}</div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--primary)', marginTop: '0.2rem' }}>{formatINR(totalSpent)}</div>
         </div>
       </div>
 
@@ -201,7 +202,7 @@ export default function CustomerOrders() {
                     <div style={{ textAlign: 'right' }}>
                       <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block' }}>Total Amount</span>
                       <span style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'var(--font-display)' }}>
-                        ${Number(order.totalPrice || 0).toFixed(2)}
+                        {formatINR(order.totalPrice)}
                       </span>
                     </div>
 

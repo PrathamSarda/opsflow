@@ -9,7 +9,6 @@ import {
   CheckCircle2, 
   AlertCircle,
   PackageCheck,
-  DollarSign,
   Layers
 } from 'lucide-react';
 import { productsApi } from '../../api';
@@ -19,6 +18,7 @@ export default function AddProduct() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [stockQuantity, setStockQuantity] = useState('');
+  const [unitSize, setUnitSize] = useState('');
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [message, setMessage] = useState('');
@@ -55,6 +55,9 @@ export default function AddProduct() {
     formData.append('description', description);
     formData.append('price', price);
     formData.append('stockQuantity', stockQuantity);
+    if (unitSize.trim()) {
+      formData.append('unitSize', unitSize.trim());
+    }
     if (imageFile) {
       formData.append('image', imageFile);
     }
@@ -69,6 +72,7 @@ export default function AddProduct() {
         setDescription('');
         setPrice('');
         setStockQuantity('');
+        setUnitSize('');
         removeImage();
       } else {
         setIsError(true);
@@ -168,12 +172,9 @@ export default function AddProduct() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div className="form-group">
-                <label htmlFor="pprice">Price ($) *</label>
+                <label htmlFor="pprice">Price (₹) *</label>
                 <div style={{ position: 'relative' }}>
-                  <DollarSign 
-                    size={16} 
-                    style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} 
-                  />
+                  <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }}>₹</span>
                   <input
                     id="pprice"
                     type="number"
@@ -206,6 +207,21 @@ export default function AddProduct() {
                     style={{ paddingLeft: '2.4rem' }}
                   />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="p-unit-size">Product Quantity / Size</label>
+                <input
+                  id="p-unit-size"
+                  type="text"
+                  maxLength={50}
+                  placeholder="e.g. 500gm, 1000gm, 1kg"
+                  value={unitSize}
+                  onChange={(e) => setUnitSize(e.target.value)}
+                />
+                <small style={{ color: 'var(--text-muted)' }}>
+                  Specify the amount or pack size included in one item.
+                </small>
               </div>
             </div>
           </div>

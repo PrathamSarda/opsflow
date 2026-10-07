@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { ordersApi } from '../../api';
+import { formatINR } from '../../utils/currency';
 
 export default function Cart() {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
@@ -213,8 +214,13 @@ export default function Cart() {
                     <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)', marginBottom: '0.2rem' }}>
                       {item.name}
                     </div>
+                    {item.unitSize && (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>
+                        {item.unitSize}
+                      </div>
+                    )}
                     <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      ${Number(item.price).toFixed(2)} each
+                      {formatINR(item.price)} each
                     </div>
                   </div>
 
@@ -244,7 +250,7 @@ export default function Cart() {
                   {/* Subtotal & Delete */}
                   <div style={{ textAlign: 'right', minWidth: '70px' }}>
                     <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-main)' }}>
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatINR(item.price * item.quantity)}
                     </div>
                     <button
                       type="button"
@@ -274,7 +280,7 @@ export default function Cart() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.925rem' }}>
                 <span>Subtotal</span>
-                <span>${totalPrice.toFixed(2)}</span>
+                <span>{formatINR(totalPrice)}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.925rem' }}>
                 <span>Standard Delivery</span>
@@ -295,7 +301,7 @@ export default function Cart() {
               }}>
                 <span style={{ fontSize: '1.05rem', fontWeight: 700 }}>Total</span>
                 <span style={{ fontSize: '1.65rem', fontWeight: 800, color: 'var(--primary)', fontFamily: 'var(--font-display)' }}>
-                  ${totalPrice.toFixed(2)}
+                  {formatINR(totalPrice)}
                 </span>
               </div>
             </div>

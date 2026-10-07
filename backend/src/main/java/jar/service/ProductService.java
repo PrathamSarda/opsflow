@@ -37,6 +37,7 @@ public class ProductService {
             if (details.getDescription() != null) existing.setDescription(details.getDescription());
             if (details.getPrice() > 0) existing.setPrice(details.getPrice());
             if (details.getStockQuantity() >= 0) existing.setStockQuantity(details.getStockQuantity());
+            if (details.getUnitSize() != null) existing.setUnitSize(details.getUnitSize());
             if (details.getImageUrl() != null) existing.setImageUrl(details.getImageUrl());
             return productRepository.save(existing);
         });

@@ -12,6 +12,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { productsApi, ordersApi } from '../../api';
+import { formatINR } from '../../utils/currency';
 
 export default function OwnerDashboard() {
   const navigate = useNavigate();
@@ -155,7 +156,7 @@ export default function OwnerDashboard() {
             </div>
           </div>
           <div style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'var(--font-display)' }}>
-            ${loading ? '...' : totalRevenue.toFixed(2)}
+            {loading ? '...' : formatINR(totalRevenue)}
           </div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
             From fulfilled sales

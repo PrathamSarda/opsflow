@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { productsApi } from '../../api';
+import { formatINR } from '../../utils/currency';
 
 export default function CustomerStore() {
   const [products, setProducts] = useState([]);
@@ -210,7 +211,7 @@ export default function CustomerStore() {
               style={{ marginLeft: '0.5rem' }}
             >
               <ShoppingCart size={16} />
-              <span>Checkout (${totalPrice.toFixed(2)})</span>
+              <span>Checkout ({formatINR(totalPrice)})</span>
             </button>
           )}
         </div>
@@ -305,6 +306,11 @@ export default function CustomerStore() {
                     <h3 style={{ fontSize: '1.15rem', marginBottom: '0.4rem', color: 'var(--text-main)' }}>
                       {product.name}
                     </h3>
+                    {product.unitSize && (
+                      <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '0.4rem' }}>
+                        {product.unitSize}
+                      </div>
+                    )}
                     <p style={{ 
                       color: 'var(--text-muted)', 
                       fontSize: '0.875rem', 
@@ -331,7 +337,7 @@ export default function CustomerStore() {
                     }}>
                       <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Price</span>
                       <span style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-main)', fontFamily: 'var(--font-display)' }}>
-                        ${Number(product.price).toFixed(2)}
+                        {formatINR(product.price)}
                       </span>
                     </div>
 

@@ -71,6 +71,14 @@ export const productsApi = {
     return res;
   },
 
+  updateImage: async (id, formData) => {
+    const res = await request(`/api/products/update/${id}/image`, {
+      method: 'POST',
+      body: formData,
+    });
+    return res;
+  },
+
   delete: async (id) => {
     const res = await request(`/api/products/delete/${id}`, {
       method: 'DELETE',

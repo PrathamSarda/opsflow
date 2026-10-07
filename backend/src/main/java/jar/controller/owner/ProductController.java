@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class ProductController {
             @RequestParam("description") String description,
             @RequestParam("price") double price,
             @RequestParam("stockQuantity") int stockQuantity,
+            @RequestParam(value = "unitSize", required = false) String unitSize,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         
         String imageUrl = "";
@@ -76,6 +78,7 @@ public class ProductController {
         product.setDescription(description);
         product.setPrice(price);
         product.setStockQuantity(stockQuantity);
+        product.setUnitSize(unitSize);
         product.setImageUrl(imageUrl);
 
         Product savedProduct = productService.saveProduct(product);
@@ -99,6 +102,38 @@ public class ProductController {
         return productService.updateProduct(id, product)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/update/{id}/image")
+    public ResponseEntity<Product> updateProductImage(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile image) throws IOException {
+        if (image.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<Product> productOptional = productService.getProductById(id);
+        if (productOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Product product = productOptional.get();
+
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        String originalName = image.getOriginalFilename();
+        String extension = "";
+        if (originalName != null && originalName.matches(".*\\.[a-zA-Z0-9]{1,10}$")) {
+            extension = originalName.substring(originalName.lastIndexOf('.'));
+        }
+        String fileName = UUID.randomUUID() + extension;
+        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+        Files.write(filePath, image.getBytes());
+
+        product.setImageUrl("http://localhost:4040/uploads/" + fileName);
+        return ResponseEntity.ok(productService.saveProduct(product));
     }
 
     @DeleteMapping("/delete/{id}")
