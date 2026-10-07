@@ -9,8 +9,9 @@ import {
   CheckCircle2, 
   RefreshCw, 
   ImageIcon, 
-  ArrowUpDown, 
-  Filter 
+  Pencil,
+  Save,
+  X
 } from 'lucide-react';
 import { productsApi } from '../../api';
 
@@ -22,6 +23,11 @@ export default function OwnerInventory() {
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [editingStockId, setEditingStockId] = useState(null);
+  const [stockInput, setStockInput] = useState('');
+  const [editingPriceId, setEditingPriceId] = useState(null);
+  const [priceInput, setPriceInput] = useState('');
+  const [savingStockId, setSavingStockId] = useState(null);
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
@@ -70,6 +76,82 @@ export default function OwnerInventory() {
       setMessage('Network error while deleting product.');
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleUpdateStock = async (product) => {
+    const quantity = Number(stockInput);
+    if (stockInput.trim() === '' || !Number.isInteger(quantity) || quantity < 0) {
+      setIsError(true);
+      setMessage('Stock quantity must be a whole number greater than or equal to zero.');
+      return;
+    }
+
+    setSavingStockId(product.id);
+    try {
+      const response = await productsApi.update(product.id, {
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        stockQuantity: quantity,
+        imageUrl: product.imageUrl,
+      });
+
+      if (response.ok) {
+        setProducts(prev => prev.map(item => (
+          item.id === product.id ? { ...item, stockQuantity: quantity } : item
+        )));
+        setEditingStockId(null);
+        setIsError(false);
+        setMessage(`Stock quantity for "${product.name}" updated to ${quantity}.`);
+      } else {
+        setIsError(true);
+        setMessage(`Failed to update stock quantity for "${product.name}".`);
+      }
+    } catch (err) {
+      console.error('Error updating product stock', err);
+      setIsError(true);
+      setMessage('Network error while updating stock quantity.');
+    } finally {
+      setSavingStockId(null);
+    }
+  };
+
+  const handleUpdatePrice = async (product) => {
+    const price = Number(priceInput);
+    if (priceInput.trim() === '' || !Number.isFinite(price) || price <= 0) {
+      setIsError(true);
+      setMessage('Price must be a number greater than zero.');
+      return;
+    }
+
+    setSavingStockId(product.id);
+    try {
+      const response = await productsApi.update(product.id, {
+        name: product.name,
+        description: product.description,
+        price,
+        stockQuantity: product.stockQuantity,
+        imageUrl: product.imageUrl,
+      });
+
+      if (response.ok) {
+        setProducts(prev => prev.map(item => (
+          item.id === product.id ? { ...item, price } : item
+        )));
+        setEditingPriceId(null);
+        setIsError(false);
+        setMessage(`Price for "${product.name}" updated to $${price.toFixed(2)}.`);
+      } else {
+        setIsError(true);
+        setMessage(`Failed to update price for "${product.name}".`);
+      }
+    } catch (err) {
+      console.error('Error updating product price', err);
+      setIsError(true);
+      setMessage('Network error while updating price.');
+    } finally {
+      setSavingStockId(null);
     }
   };
 
@@ -277,21 +359,133 @@ export default function OwnerInventory() {
                     </div>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-main)' }}>
-                      ${Number(product.price).toFixed(2)}
-                    </span>
+                    {editingPriceId === product.id ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <input
+                          type="number"
+                          min="0.01"
+                          step="0.01"
+                          aria-label={`Price for ${product.name}`}
+                          value={priceInput}
+                          onChange={(e) => setPriceInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleUpdatePrice(product);
+                            if (e.key === 'Escape') setEditingPriceId(null);
+                          }}
+                          style={{ width: '100px' }}
+                          disabled={savingStockId === product.id}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm"
+                          onClick={() => handleUpdatePrice(product)}
+                          disabled={savingStockId === product.id}
+                          aria-label={`Save price for ${product.name}`}
+                        >
+                          <Save size={14} />
+                          <span>{savingStockId === product.id ? 'Saving...' : 'Save'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setEditingPriceId(null)}
+                          disabled={savingStockId === product.id}
+                          aria-label={`Cancel price edit for ${product.name}`}
+                        >
+                          <X size={14} />
+                          <span>Cancel</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-main)' }}>
+                          ${Number(product.price).toFixed(2)}
+                        </span>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => {
+                            setEditingStockId(null);
+                            setEditingPriceId(product.id);
+                            setPriceInput(String(product.price));
+                            setMessage('');
+                          }}
+                          disabled={savingStockId === product.id}
+                          aria-label={`Edit price for ${product.name}`}
+                        >
+                          <Pencil size={14} />
+                          <span>Edit</span>
+                        </button>
+                      </div>
+                    )}
                   </td>
                   <td>
-                    {product.stockQuantity > 0 ? (
-                      <span className="badge badge-instock">
-                        <CheckCircle2 size={12} />
-                        <span>{product.stockQuantity} in stock</span>
-                      </span>
+                    {editingStockId === product.id ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          aria-label={`Stock quantity for ${product.name}`}
+                          value={stockInput}
+                          onChange={(e) => setStockInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleUpdateStock(product);
+                            if (e.key === 'Escape') setEditingStockId(null);
+                          }}
+                          style={{ width: '90px' }}
+                          disabled={savingStockId === product.id}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm"
+                          onClick={() => handleUpdateStock(product)}
+                          disabled={savingStockId === product.id}
+                          aria-label={`Save stock quantity for ${product.name}`}
+                        >
+                          <Save size={14} />
+                          <span>{savingStockId === product.id ? 'Saving...' : 'Save'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setEditingStockId(null)}
+                          disabled={savingStockId === product.id}
+                          aria-label={`Cancel stock edit for ${product.name}`}
+                        >
+                          <X size={14} />
+                          <span>Cancel</span>
+                        </button>
+                      </div>
                     ) : (
-                      <span className="badge badge-outstock">
-                        <AlertCircle size={12} />
-                        <span>Out of stock</span>
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {product.stockQuantity > 0 ? (
+                          <span className="badge badge-instock">
+                            <CheckCircle2 size={12} />
+                            <span>{product.stockQuantity} in stock</span>
+                          </span>
+                        ) : (
+                          <span className="badge badge-outstock">
+                            <AlertCircle size={12} />
+                            <span>Out of stock</span>
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => {
+                            setEditingPriceId(null);
+                            setEditingStockId(product.id);
+                            setStockInput(String(product.stockQuantity));
+                            setMessage('');
+                          }}
+                          disabled={savingStockId === product.id}
+                          aria-label={`Edit stock quantity for ${product.name}`}
+                        >
+                          <Pencil size={14} />
+                          <span>Edit</span>
+                        </button>
+                      </div>
                     )}
                   </td>
                   <td style={{ textAlign: 'right' }}>
