@@ -41,14 +41,17 @@ Java JDK 17+ (for Spring Boot backend)
 MySQL Server
 
 1. Backend Setup (Spring Boot)
-Configure your database connection in src/main/resources/application.properties:
+The backend expects a MySQL database. Set these environment variables before starting it; keep credentials out of `application.properties` and source control:
 
-Properties
-spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name
-spring.datasource.username=your_db_username
-spring.datasource.password=your_db_password
-spring.jpa.hibernate.ddl-auto=update
-Run the Spring Boot application (starts on port 4040).
+```powershell
+$env:AIVEN_MYSQL_HOST = "your-mysql-host"
+$env:AIVEN_MYSQL_PORT = "3306"
+$env:AIVEN_MYSQL_DATABASE = "opsflow"
+$env:AIVEN_MYSQL_USER = "your-db-user"
+$env:AIVEN_MYSQL_PASSWORD = "your-db-password"
+```
+
+For Aiven, use the connection host, port, database, and user shown in its service connection information. The backend uses Hibernate `ddl-auto=update` to create/update entity tables without dropping existing table data. Start the Spring Boot application (port 4040) after setting the variables.
 
 2. Frontend Setup (React)
 Navigate to the frontend directory and install dependencies:
