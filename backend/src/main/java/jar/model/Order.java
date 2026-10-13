@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -25,6 +27,7 @@ public class Order {
     private LocalDateTime createdAt;
 
     @ElementCollection
+    @CollectionTable(name = "orders_ordered_items", joinColumns = @JoinColumn(name = "order_id"))
     private List<String> orderedItems; // Summary list of item names & quantities
 
     @PrePersist
