@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175"}, allowCredentials = "true")
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -27,12 +26,10 @@ public class AuthController {
             user.getPassword() == null || user.getPassword().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Username and password are required.");
         }
-
         String username = user.getUsername().trim();
         if (userService.existsByUsername(username) || "owner".equalsIgnoreCase(username)) {
             return ResponseEntity.badRequest().body("Username is already taken. Please choose another.");
         }
-
         user.setUsername(username);
         userService.registerUser(user);
         return ResponseEntity.ok("Signup successful! You can now log in.");
@@ -45,19 +42,15 @@ public class AuthController {
             response.put("error", "Username and password are required");
             return ResponseEntity.status(400).body(response);
         }
-
         String username = loginRequest.getUsername().trim();
         String loginResult = userService.login(username, loginRequest.getPassword());
         Map<String, String> response = new HashMap<>();
-
         if (loginResult.equals("owner_success") || loginResult.equals("customer_success")) {
-            String token = jwtUtil.generateToken(username);
-            response.put("token", token);
+            response.put("token", jwtUtil.generateToken(username));
             response.put("role", loginResult);
             response.put("username", username);
             return ResponseEntity.ok(response);
         }
-
         response.put("error", "Invalid username or password");
         return ResponseEntity.status(401).body(response);
     }
