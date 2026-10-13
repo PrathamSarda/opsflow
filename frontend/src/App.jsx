@@ -9,7 +9,7 @@ import OwnerDashboard from './components/owner/OwnerDashboard';
 import AddProduct from './components/owner/AddProduct';
 import OwnerInventory from './components/owner/OwnerInventory';
 import CustomerStore from './components/customer/CustomerStore';
-import Cart from './components/customer/cart';
+import Cart from './components/customer/Cart.jsx';
 import OwnerOrders from './components/owner/OwnerOrders';
 import CustomerOrders from './components/customer/CustomerOrders';
 import CustomerProfile from './components/customer/CustomerProfile';
